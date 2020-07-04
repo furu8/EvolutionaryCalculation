@@ -1,12 +1,12 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import sys
 
 def sphere_func(D, X, i):
     ans = 0
     for d in range(D):
         Xd = X[i][d]
-        print(Xd)
         ans += Xd ** 2
     return ans
 
@@ -17,7 +17,7 @@ def rastringin_func(D, X, i):
         ans += Xd**2 - 10*np.cos(2*np.pi*Xd) + 10
     return ans
 
-def main(M, D, c, w):
+def main(M, D, c, w, fx):
     Tmax = 1000          # 最大繰り返し回数
     Cr = 1e-5            # 終了条件
     x_min, x_max = -5, 5 # 範囲
@@ -32,8 +32,13 @@ def main(M, D, c, w):
 
     for t in range(1, Tmax+1):
         for i in range(0, M):
-            # F[i] = sphere_func(D, X, i)
-            F[i] = rastringin_func(D, X, i)
+            if fx == 'sphere':
+                F[i] = sphere_func(D, X, i)
+            elif fx == 'rastringin':
+                F[i] = rastringin_func(D, X, i)
+            else:
+                print('引数fxが間違っています')
+
             if F[i] < Fp[i]:
                 Fp[i] = F[i]
                 for d in range(D):
@@ -50,17 +55,47 @@ def main(M, D, c, w):
                 r2 = np.random.rand()
                 V[i][d] = w*V[i][d] + c*r1*(Xp[i][d] - X[i][d]) + c*r2*(Xg[d] - X[i][d])
                 X[i][d] = X[i][d] + V[i][d]
-                
-    print("終了時刻t={}".format(t))
-    print("解の目的関数値Fg={}".format(Fg))
-    print("解Xg=[")
-    for d in range(1, D-1):
-        print("{}".format(Xg[d]))
-    print("]\n")
+   
+    # print("終了時刻t={}".format(t))
+    # print("解の目的関数値Fg={}".format(Fg))
+    # print("解Xg={}".format(Xg))
+    return t, Fg
 
 if __name__ == "__main__":
-    M = 30     # 粒子数
-    D = 5      # 解の次元
-    c = 1.494  # PSOのパラメータ
-    w = 0.729  # PSOのパラメータ
-    main(M, D, c, w)    
+    M = 30                  # 粒子数
+    D_list = [2]     # 解の次元
+    c = 1.494               # PSOのパラメータ
+    w = 0.729               # PSOのパラメータ
+    # fx_list = ['sphere', 'rastringin']
+    fx_list = ['sphere']
+
+    time_list = np.array([])
+    fg_list = np.array([])
+
+    ans_d_list = []
+    ans_fx_list = []
+    ans_fg_mean_list = []
+    ans_fg_var_list = []
+    ans_time_mean_list = []
+    df = pd.DataFrame(columns=['d', 'fx_type', 'fg_mean', 'fg_var', 'time_mean'])
+    
+    for d in D_list:
+        for fx in fx_list:
+            for i in range(100): 
+                t, Fg = main(M, d, c, w, fx)
+                time_list = np.append(time_list,t)
+                fg_list = np.append(fg_list,Fg)
+            ans_d_list.append(d)
+            ans_fx_list.append(fx)
+            ans_fg_mean_list.append(fg_list.mean())
+            ans_fg_var_list.append(fg_list.var())
+            ans_time_mean_list.append(time_list.mean())
+
+    df['d'] = ans_d_list
+    df['fx_type'] = ans_fx_list
+    df['fg_mean'] = ['{:.1e}'.format(m) for m in ans_fg_mean_list]
+    df['fg_var'] = ['{:.3e}'.format(v) for v in ans_fg_var_list]
+    df['time_mean'] = ans_time_mean_list
+
+    print(df)
+        
