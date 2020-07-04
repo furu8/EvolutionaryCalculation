@@ -30,6 +30,8 @@ def main(M, D, c, w, fx):
     Fg = float('inf')                             # gbest
     Xg = np.full(D, float('inf'))
 
+    cnvg_plot = []
+
     for t in range(1, Tmax+1):
         for i in range(0, M):
             if fx == 'sphere':
@@ -48,6 +50,7 @@ def main(M, D, c, w, fx):
                     for d in range(D):
                         Xg[d] = X[i][d]
         if Fg < Cr:
+            cnvg_plot.append([t, Fg])
             break
         for i in range(M):
             for d in range(D):
@@ -55,11 +58,11 @@ def main(M, D, c, w, fx):
                 r2 = np.random.rand()
                 V[i][d] = w*V[i][d] + c*r1*(Xp[i][d] - X[i][d]) + c*r2*(Xg[d] - X[i][d])
                 X[i][d] = X[i][d] + V[i][d]
-   
+           
     # print("終了時刻t={}".format(t))
     # print("解の目的関数値Fg={}".format(Fg))
     # print("解Xg={}".format(Xg))
-    return t, Fg
+    return t, Fg, cnvg_plot
 
 if __name__ == "__main__":
     M = 30                  # 粒子数
@@ -71,25 +74,29 @@ if __name__ == "__main__":
 
     time_list = np.array([])
     fg_list = np.array([])
-
+    cnvg_plot_list = []
+    
     ans_d_list = []
     ans_fx_list = []
     ans_fg_mean_list = []
     ans_fg_var_list = []
     ans_time_mean_list = []
+    
     df = pd.DataFrame(columns=['d', 'fx_type', 'fg_mean', 'fg_var', 'time_mean'])
     
     for d in D_list:
         for fx in fx_list:
             for i in range(100): 
-                t, Fg = main(M, d, c, w, fx)
+                t, Fg, cnvg = main(M, d, c, w, fx)
                 time_list = np.append(time_list,t)
                 fg_list = np.append(fg_list,Fg)
+                cnvg_plot_list.append(cnvg)
             ans_d_list.append(d)
             ans_fx_list.append(fx)
             ans_fg_mean_list.append(fg_list.mean())
             ans_fg_var_list.append(fg_list.var())
             ans_time_mean_list.append(time_list.mean())
+
 
     df['d'] = ans_d_list
     df['fx_type'] = ans_fx_list
