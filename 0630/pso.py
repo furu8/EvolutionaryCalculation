@@ -14,7 +14,7 @@ def rastringin_func(D, X, i):
     ans = 0
     for d in range(D):
         Xd = X[i][d]
-        ans += Xd**2 - 10*np.cos(2*np.pi*Xd) + 10
+        ans += ((Xd**2) - 10*np.cos(2*np.pi*Xd) + 10)
     return ans
 
 def main(M, D, c, w, fx):
@@ -27,7 +27,7 @@ def main(M, D, c, w, fx):
     F = np.zeros(M)     # 評価関数を格納
     Fp = np.full(M, float('inf'))      # pbest
     Xp = np.full((M, D), float('inf'))
-    Fg = float('inf')                             # gbest
+    Fg = float('inf')                  # gbest
     Xg = np.full(D, float('inf'))
 
     cnvg_plot = []
@@ -43,21 +43,18 @@ def main(M, D, c, w, fx):
 
             if F[i] < Fp[i]:
                 Fp[i] = F[i]
-                for d in range(D):
-                    Xp[i][d] = X[i][d]
+                Xp[i] = X[i]
                 if Fp[i] < Fg:
                     Fg = Fp[i]
-                    for d in range(D):
-                        Xg[d] = X[i][d]
+                    Xg = X[i]
         if Fg < Cr:
             cnvg_plot.append([t, Fg])
             break
         for i in range(M):
-            for d in range(D):
-                r1 = np.random.rand()
-                r2 = np.random.rand()
-                V[i][d] = w*V[i][d] + c*r1*(Xp[i][d] - X[i][d]) + c*r2*(Xg[d] - X[i][d])
-                X[i][d] = X[i][d] + V[i][d]
+            r1 = np.random.rand()
+            r2 = np.random.rand()
+            V[i] = w*V[i] + c*r1*(Xp[i] - X[i]) + c*r2*(Xg - X[i])
+            X[i] = X[i] + V[i]
            
     # print("終了時刻t={}".format(t))
     # print("解の目的関数値Fg={}".format(Fg))
@@ -69,7 +66,7 @@ if __name__ == "__main__":
     D_list = [2]     # 解の次元
     c = 1.494               # PSOのパラメータ
     w = 0.729               # PSOのパラメータ
-    # fx_list = ['sphere', 'rastringin']
+    # fx_list = ['rastringin']
     fx_list = ['sphere']
 
     time_list = np.array([])
@@ -100,9 +97,10 @@ if __name__ == "__main__":
 
     df['d'] = ans_d_list
     df['fx_type'] = ans_fx_list
-    df['fg_mean'] = ['{:.1e}'.format(m) for m in ans_fg_mean_list]
+    df['fg_mean'] = ['{:.3e}'.format(m) for m in ans_fg_mean_list]
     df['fg_var'] = ['{:.3e}'.format(v) for v in ans_fg_var_list]
     df['time_mean'] = ans_time_mean_list
 
+    # df.to_csv('pso.csv')
     print(df)
         
