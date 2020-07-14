@@ -19,42 +19,60 @@ def rastringin_func(D, X, i):
 
 def main(M, D, c, w, fx):
     Tmax = 1000          # 最大繰り返し回数
-    Cr = 1e-5            # 終了条件
+    Cr = 0.9             # 終了条件
     x_min, x_max = -5, 5 # 範囲
 
     X = (x_max - x_min) * np.random.rand(M,D) + x_min # 位置
+    Xnew = (x_max - x_min) * np.random.rand(M,D) + x_min # 位置
     V = np.zeros((M,D)) # 速度
+    U = np.zeros(d)     # 解候補
     F = np.zeros(M)     # 評価関数を格納
-    Fp = np.full(M, float('inf'))      # pbest
-    Xp = np.full((M, D), float('inf'))
-    Fg = float('inf')                  # gbest
-    Xg = np.full(D, float('inf'))
+    Ftmp = 0     # 評価関数を格納
+    Fend = 1e-5 # 終了条件
+    Fbest = np.full(M, float('inf'))      # pbest
+    Xbest = np.full((M, D), float('inf'))
 
     cnvg_plot = []
 
     for t in range(1, Tmax+1):
-        for i in range(0, M):
+        for i in range(M):
+            for j in range(D):
+                # 3個体選ぶ
+                
+                # Vを作成
+                
+                pass
+            
+            Jr = np.random.rand()
+
+            for j in range(D):
+                ri = np.random.rand()
+                if ri < Cr or j == Jr:
+                    U[j] = V[j]
+                else:
+                    U[j] = X[i][j]
+            
             if fx == 'sphere':
-                F[i] = sphere_func(D, X, i)
+                Ftmp = sphere_func(D, X, i)
             elif fx == 'rastringin':
-                F[i] = rastringin_func(D, X, i)
+                Ftmp = rastringin_func(D, X, i)
             else:
                 print('引数fxが間違っています')
 
-            if F[i] < Fp[i]:
-                Fp[i] = F[i]
-                Xp[i] = X[i]
-                if Fp[i] < Fg:
-                    Fg = Fp[i]
-                    Xg = X[i]
-        if Fg < Cr:
+            if Ftmp < F[i]:
+                F[i] = Ftmp
+                # XnewをUで上書き
+                Xnew[i] = U
+                # Fbest、Xbest更新
+                Fbest = Ftmp
+                Xbest = X[i]
+            else:
+                # XnewをXで上書き
+                Xnew[i] = X
+
+        if Fbest < Fend:
             cnvg_plot.append([t, Fg])
             break
-        for i in range(M):
-            r1 = np.random.rand()
-            r2 = np.random.rand()
-            V[i] = w*V[i] + c*r1*(Xp[i] - X[i]) + c*r2*(Xg - X[i])
-            X[i] = X[i] + V[i]
            
     # print("終了時刻t={}".format(t))
     # print("解の目的関数値Fg={}".format(Fg))
@@ -62,12 +80,11 @@ def main(M, D, c, w, fx):
     return t, Fg, cnvg_plot
 
 if __name__ == "__main__":
-    M = 30                  # 粒子数
+    M = 30                # 個体数
     D_list = [2]     # 解の次元
-    c = 1.494               # PSOのパラメータ
-    w = 0.729               # PSOのパラメータ
-    尾x_list = ['sphere', 'rastringin']
-
+    c = 0.9               # DEのパラメータ
+    Fw = 0.5              # DEのパラメータ
+    fx_list = ['sphere', 'rastringin']
 
     time_list = np.array([])
     fg_list = np.array([])
@@ -84,7 +101,7 @@ if __name__ == "__main__":
     for d in D_list:
         for fx in fx_list:
             for i in range(100): 
-                t, Fg, cnvg = main(M, d, c, w, fx)
+                t, Fg, cnvg = main(M, d, c, Fw, fx)
                 time_list = np.append(time_list,t)
                 fg_list = np.append(fg_list,Fg)
                 cnvg_plot_list.append(cnvg)
