@@ -66,7 +66,7 @@ if __name__ == "__main__":
     D_list = [2]     # 解の次元
     c = 1.494               # PSOのパラメータ
     w = 0.729               # PSOのパラメータ
-    尾x_list = ['sphere', 'rastringin']
+    fx_list = ['sphere', 'rastringin']
 
 
     time_list = np.array([])
