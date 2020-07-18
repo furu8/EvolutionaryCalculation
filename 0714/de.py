@@ -104,7 +104,7 @@ def main(M, D, c, Fw, fx):
 
 if __name__ == "__main__":
     M = 30                # 個体数
-    D_list = [20]   # 解の次元
+    D_list = [2, 5, 20]   # 解の次元
     c = 0.9               # DEのパラメータ
     Fw = 0.5              # DEのパラメータ
     fx_list = ['sphere', 'rastrigin']
@@ -128,7 +128,7 @@ if __name__ == "__main__":
                 time_list = np.append(time_list,t)
                 fg_list = np.append(fg_list,Fg)
                 cnvg_plot_list.append(cnvg)
-                break
+                # break
             ans_d_list.append(d)
             ans_fx_list.append(fx)
             ans_fg_mean_list.append(fg_list.mean())
