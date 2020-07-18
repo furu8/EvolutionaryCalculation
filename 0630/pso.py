@@ -36,7 +36,7 @@ def main(M, D, c, w, fx):
         for i in range(0, M):
             if fx == 'sphere':
                 F[i] = sphere_func(D, X, i)
-            elif fx == 'rastringin':
+            elif fx == 'rastrigin':
                 F[i] = rastringin_func(D, X, i)
             else:
                 print('引数fxが間違っています')
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     D_list = [2]     # 解の次元
     c = 1.494               # PSOのパラメータ
     w = 0.729               # PSOのパラメータ
-    fx_list = ['sphere', 'rastringin']
+    fx_list = ['sphere', 'rastrigin']
 
 
     time_list = np.array([])
