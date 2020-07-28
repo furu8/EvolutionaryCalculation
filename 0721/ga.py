@@ -21,7 +21,7 @@ class GA:
 
         self.cnvg_plot = []
 
-    def evaluate_ans(self):
+    def evaluate_fitness_value(self):
         for i in range(self.M):
             w = 0
             for d in range(self.D):
@@ -32,41 +32,42 @@ class GA:
                     w += self.weight[d]
             if w > self.wmax:
                 self.f[i] = 1
-        print(self.f)
 
     def calc_ga(self):
         for t in range(1, self.tmax+1):
             # 各個体の評価値F[i]を計算
-            print(t)
-            self.evaluate_ans()
-            break
-                
-        #     # 最良値Fbestと最適解Xbest[]の更新
-        #     # M個の子個体を生成
-        #     for m in range(M):
-        #         # ルーレット洗濯で親個体p1,p2を選ぶ
-        #         # 交叉する次元d1,d2をランダム生成
-                
-        #         # d1 < d2となるように入替
-        #         if d1 > d2:
-        #             d1, d2 = d2, d1
-        #         # 二点交叉により、子Xnext[i][]を生成
-        #         for d in range(D):
-        #             if d <= d1 or d > d2:
-        #                 Xnext[i][d] = X[p1][d]
-        #             else:
-        #                 Xnext[i][d] = X[p2][d]
-        #         for d in range(D):
-        #             if np.random.rand() < Pm:
-        #                 Xnext[i][d] = 1 - Xnext[i][d]
+            self.evaluate_fitness_value()
+            # 最良値Fbestと最適解Xbest[]の更新
+            if max(self.f) > self.fbest:
+                self.fbest = max(self.f)
+                self.xbest = self.x[np.argmax(self.f)]
+            # M個の子個体を生成
+            for i in range(M):
+                # ルーレット選択で親個体p1,p2を選ぶ
+                sumf_list = self.f / sum(self.f)
+                p1, p2 = np.random.choice(range(self.M), 2, replace=False, p=sumf_list)
+                # 交叉する次元d1,d2をランダム生成
+                d1, d2 = np.random.choice(range(self.D), 2, replace=False)
+                # d1 < d2となるように入替
+                if d1 > d2:
+                    d1, d2 = d2, d1
+                # 二点交叉により、子Xnext[i][]を生成
+                for d in range(self.D):
+                    if d <= d1 or d > d2:
+                        self.xnext[i][d] = self.x[p1][d]
+                    else:
+                        self.xnext[i][d] = self.x[p2][d]
+                # 突然変異
+                for d in range(self.D):
+                    if np.random.rand() < self.pm:
+                        self.xnext[i][d] = 1 - self.xnext[i][d]
         
-        #     # XにXnextを上書き
-        #     X = Xnext
+            # XにXnextを上書き
+            self.x = self.xnext
         
         # print('解の目的関数値 Fg = {}'.format(Fbest))
         # print('最適解 Xbest = {}'.format(Xbest))            
 
-        # return t, Fbest, cnvg_plot
 
     # def main():
         # time_list = np.array([])
@@ -115,7 +116,8 @@ if __name__ == "__main__":
     M = 20                # 個体数
     D_list = [5, 10]      # 解の次元
 
-    ga = GA(M,5)
-    ga.calc_ga()
-    # print(t)
-    print(ga.fbest)
+    for i in range(100):
+        ga = GA(M,5)
+        ga.calc_ga()
+        # print(t)
+        print(i, ga.fbest, ga.xbest)
