@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import sys
+import copy
 
 class GA:
     def __init__(self, M, D):
@@ -23,6 +24,7 @@ class GA:
 
     def evaluate_fitness_value(self):
         for i in range(self.M):
+            self.f[i] = 0
             w = 0
             for d in range(self.D):
                 if self.x[i][d] == 0: # 染色体が0だったら無視
@@ -30,19 +32,23 @@ class GA:
                 else:
                     self.f[i] += self.value[d]
                     w += self.weight[d]
+            # 制限を超えたら小さい値を適当に
             if w > self.wmax:
                 self.f[i] = 1
 
     def calc_ga(self):
         for t in range(1, self.tmax+1):
+            # print(t)
             # 各個体の評価値F[i]を計算
             self.evaluate_fitness_value()
             # 最良値Fbestと最適解Xbest[]の更新
             if max(self.f) > self.fbest:
                 self.fbest = max(self.f)
-                self.xbest = self.x[np.argmax(self.f)]
+                # print(self.f)
+                self.xbest = np.copy(self.x[np.argmax(self.f)])
+                # print(self.xbest)
             # M個の子個体を生成
-            for i in range(M):
+            for i in range(self.M):
                 # ルーレット選択で親個体p1,p2を選ぶ
                 sumf_list = self.f / sum(self.f)
                 p1, p2 = np.random.choice(range(self.M), 2, replace=False, p=sumf_list)
@@ -63,61 +69,17 @@ class GA:
                         self.xnext[i][d] = 1 - self.xnext[i][d]
         
             # XにXnextを上書き
-            self.x = self.xnext
-        
-        # print('解の目的関数値 Fg = {}'.format(Fbest))
-        # print('最適解 Xbest = {}'.format(Xbest))            
-
-
-    # def main():
-        # time_list = np.array([])
-        # fg_list = np.array([])
-        # cnvg_plot_list = []
-
-        # ans_d_list = []
-        # ans_fx_list = []
-        # ans_fg_mean_list = []
-        # ans_fg_var_list = []
-        # ans_time_mean_list = []
-        
-        # df = pd.DataFrame(columns=['d', 'fx_type', 'fg_mean', 'fg_var', 'time_mean'])
-            
-        # for d in D_list:
-        #     for i in range(100): 
-        #         ga = GA(M,D)
-        #         t, self.fbest, cnvg_plot = ga.calc_ga()
-        #         time_list = np.append(time_list,t)
-        #         fg_list = np.append(fg_list,Fg)
-        #         cnvg_plot_list.append(cnvg)
-        #         # break
-        #     ans_d_list.append(d)
-        #     ans_fx_list.append(fx)
-        #     ans_fg_mean_list.append(fg_list.mean())
-        #     ans_fg_var_list.append(fg_list.var())
-        #     ans_time_mean_list.append(time_list.mean())
-            
-        # print("解の目的関数値Fg={}".format(ans_fg_mean_list))
-
-        # f['d'] = ans_d_list
-        # df['fx_type'] = ans_fx_list
-        # df['fg_mean'] = ['{:.3e}'.format(m) for m in ans_fg_mean_list]
-        # df['fg_var'] = ['{:.3e}'.format(v) for v in ans_fg_var_list]
-        # df['time_mean'] = ans_time_mean_list
-
-        # # df.to_csv('de.csv')
-        # print(df)
-
-        
-        # t, Fbest, cnvg_plot = 
-        
-
+            self.x = np.copy(self.xnext)   
 
 if __name__ == "__main__":
     M = 20                # 個体数
     D_list = [5, 10]      # 解の次元
+    count = 0
 
     for i in range(100):
         ga = GA(M,5)
         ga.calc_ga()
-        # print(t)
-        print(i, ga.fbest, ga.xbest)
+        # print(i, ga.fbest, ga.xbest)
+        if ga.fbest == 125:
+            count += 1
+    print(count)
