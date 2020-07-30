@@ -5,12 +5,12 @@ import sys
 import copy
 
 class GA:
-    def __init__(self, M, D):
+    def __init__(self, M, D, W, V, Wmax):
         self.M = M
         self.D = D
-        self.weight = np.array([7, 5, 1, 9, 6])
-        self.value = np.array([50, 40, 10, 70, 55])
-        self.wmax  = 15 # 例題1は15、例題2は20
+        self.weight = W
+        self.value = V
+        self.wmax  = Wmax          # 例題1は15、例題2は20
         self.pm = 0.05             # 突然変異確率
         self.tmax = 100            # 最大繰り返し回数
 
@@ -38,15 +38,12 @@ class GA:
 
     def calc_ga(self):
         for t in range(1, self.tmax+1):
-            # print(t)
             # 各個体の評価値F[i]を計算
             self.evaluate_fitness_value()
             # 最良値Fbestと最適解Xbest[]の更新
             if max(self.f) > self.fbest:
                 self.fbest = max(self.f)
-                # print(self.f)
                 self.xbest = np.copy(self.x[np.argmax(self.f)])
-                # print(self.xbest)
             # M個の子個体を生成
             for i in range(self.M):
                 # ルーレット選択で親個体p1,p2を選ぶ
@@ -73,13 +70,20 @@ class GA:
 
 if __name__ == "__main__":
     M = 20                # 個体数
-    D_list = [5, 10]      # 解の次元
-    count = 0
+    wmax_list = [15, 20]
+    W_list = [[7, 5, 1, 9, 6], [3, 6, 5, 4, 8, 5, 3, 4, 8, 2]]
+    V_list = [[50, 40, 10, 70, 55], [70, 120, 90, 70, 130, 80, 40, 50, 30, 70]]
 
-    for i in range(100):
-        ga = GA(M,5)
-        ga.calc_ga()
-        # print(i, ga.fbest, ga.xbest)
-        if ga.fbest == 125:
-            count += 1
-    print(count)
+    w = 0
+    for W, V in zip(W_list, V_list):
+        print(W)
+        count = 0
+        D = len(W) # 解の次元数
+        for i in range(100):
+            ga = GA(M, D, np.array(W), np.array(V), wmax_list[w])
+            ga.calc_ga()
+            print(i, ga.fbest, ga.xbest)
+            if ga.fbest == 125 or ga.fbest == 420:
+                count += 1
+        w += 1
+        print(D, count)
