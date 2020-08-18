@@ -39,7 +39,10 @@ def rastringin_func(D, U):
         ans += ((Xd**2) - 10*np.cos(2*np.pi*Xd) + 10)
     return ans
 
-def main(M, D, c, Fw, fx):
+def main(D, fx):
+    M = 30                # 個体数
+    c = 0.9               # DEのパラメータ
+    Fw = 0.5              # DEのパラメータ
     Tmax = 1000          # 最大繰り返し回数
     Cr = 0.9             # 終了条件
     x_min, x_max = -5, 5 # 範囲
@@ -53,12 +56,15 @@ def main(M, D, c, Fw, fx):
     Fend = 1e-5 # 終了条件
     Fbest = float('inf')
     Xbest = np.full(D, float('inf'))
-    cnvg_plot = []
+
+    plot_t_list = []
+    plot_fg_list = []
 
     # 初期値によるF = f(x^0ベクトル) の計算
     F = init_fx(M, D, X, fx)
 
     for t in range(1, Tmax+1):
+        
         for i in range(M):
             # 3個体選ぶ
             a, b, c = np.random.choice(np.arange(M), 3, replace=False)
@@ -94,7 +100,6 @@ def main(M, D, c, Fw, fx):
         # XをXnewで上書き     
         X = Xnew
         if Fbest < Fend:
-            cnvg_plot.append([t, Fbest])
             break
            
     # print("終了時刻t={}".format(t))
@@ -103,10 +108,8 @@ def main(M, D, c, Fw, fx):
     return t, Fbest, cnvg_plot
 
 if __name__ == "__main__":
-    M = 30                # 個体数
     D_list = [2, 5, 20]   # 解の次元
-    c = 0.9               # DEのパラメータ
-    Fw = 0.5              # DEのパラメータ
+    
     fx_list = ['sphere', 'rastrigin']
 
     time_list = np.array([])
@@ -124,10 +127,10 @@ if __name__ == "__main__":
     for d in D_list:
         for fx in fx_list:
             for i in range(100): 
-                t, Fg, cnvg = main(M, d, c, Fw, fx)
+                t, Fg, cnvg = main(d, fx)
                 time_list = np.append(time_list,t)
                 fg_list = np.append(fg_list,Fg)
-                cnvg_plot_list.append(cnvg)
+                
                 # break
             ans_d_list.append(d)
             ans_fx_list.append(fx)
