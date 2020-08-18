@@ -64,7 +64,8 @@ def main(D, fx):
     F = init_fx(M, D, X, fx)
 
     for t in range(1, Tmax+1):
-        
+        plot_t_list.append(t)
+        plot_fg_list.append(Fbest)
         for i in range(M):
             # 3個体選ぶ
             a, b, c = np.random.choice(np.arange(M), 3, replace=False)
@@ -105,10 +106,10 @@ def main(D, fx):
     # print("終了時刻t={}".format(t))
     # print("解の目的関数値Fbest={}".format(Fbest))
 
-    return t, Fbest, cnvg_plot
+    return t, Fbest, plot_t_list, plot_fg_list
 
 if __name__ == "__main__":
-    D_list = [2, 5, 20]   # 解の次元
+    D_list = [2]   # 解の次元
     
     fx_list = ['sphere', 'rastrigin']
 
@@ -121,22 +122,31 @@ if __name__ == "__main__":
     ans_fg_mean_list = []
     ans_fg_var_list = []
     ans_time_mean_list = []
+
+    ans_plot_t_mean_list = []
+    ans_plot_fg_mean_list = []
     
     df = pd.DataFrame(columns=['d', 'fx_type', 'fg_mean', 'fg_var', 'time_mean'])
     
     for d in D_list:
         for fx in fx_list:
-            for i in range(100): 
-                t, Fg, cnvg = main(d, fx)
-                time_list = np.append(time_list,t)
-                fg_list = np.append(fg_list,Fg)
-                
-                # break
+            t_df = pd.DataFrame()
+            fg_df = pd.DataFrame()
+            print(d, fx)
+            for i in range(10): 
+                t, Fg, plot_t_list, plot_fg_list = main(d, fx)
+                time_list = np.append(time_list, t)
+                fg_list = np.append(fg_list, Fg)
+                t_df = pd.concat([t_df, pd.Series(plot_t_list)], axis=1)
+                fg_df = pd.concat([fg_df, pd.Series(plot_fg_list)], axis=1)
+            
             ans_d_list.append(d)
             ans_fx_list.append(fx)
             ans_fg_mean_list.append(fg_list.mean())
             ans_fg_var_list.append(fg_list.var())
             ans_time_mean_list.append(time_list.mean())
+            ans_plot_t_mean_list.append(t_df.T.mean())
+            ans_plot_fg_mean_list.append(fg_df.T.mean())
          
         print("解の目的関数値Fg={}".format(ans_fg_mean_list))
 
@@ -149,4 +159,6 @@ if __name__ == "__main__":
 
     # df.to_csv('de.csv')
     print(df)
-        
+
+    plt.plot(ans_plot_t_mean_list[1], ans_plot_fg_mean_list[1])
+    plt.show()
