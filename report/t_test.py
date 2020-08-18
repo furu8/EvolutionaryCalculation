@@ -11,7 +11,7 @@ def extract_col_parameter(df, col):
     return [df[col][idx] for idx in idx_list]
 
 def calc_test(pso_mean_list, de_mean_list, pso_var_list, de_var_list, n):
-    [print(pso_mean_list[i], de_mean_list[i], pso_var_list[i], de_var_list[i]) for i in range(4)]
+    # [print(pso_mean_list[i], de_mean_list[i], pso_var_list[i], de_var_list[i]) for i in range(4)]
     return [pso_mean_list[i] - de_mean_list[i] / np.sqrt((pso_var_list[i] + de_var_list[i]) / (n - 1)) for i in range(4)]
 
 def judge_test(t_list):
@@ -33,9 +33,6 @@ def main():
 
     pso_df = read_df('pso.csv')
     de_df = read_df('de.csv')
-
-    print(pso_df)
-    print(de_df)
     
     pso_mean_list = extract_col_parameter(pso_df, 'fg_mean')
     de_mean_list = extract_col_parameter(de_df, 'fg_mean')
@@ -45,6 +42,8 @@ def main():
     t_list = calc_test(pso_mean_list, de_mean_list, pso_var_list, de_var_list, pso_n)
     
     judge_test(t_list)
+
+    print(t_list)
 
 if __name__ == "__main__":
     main()

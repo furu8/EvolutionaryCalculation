@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import sys
-tmp = 0
+
 def sphere_func(D, X, i):
     ans = 0
     for d in range(D):
@@ -11,17 +11,13 @@ def sphere_func(D, X, i):
     return ans
 
 def rastringin_func(D, X, i):
-    global tmp
     ans = 0
     for d in range(D):
         Xd = X[i][d]
         ans += ((Xd**2) - 10*np.cos(2*np.pi*Xd) + 10)
-    if 1 > ans > 0.99:
-        tmp = X
     return ans
 
 def main(D, fx):
-    global tmp
     M = 30               # 粒子数
     c = 1.494            # PSOのパラメータ
     w = 0.729            # PSOのパラメータ
@@ -29,19 +25,17 @@ def main(D, fx):
     Cr = 1e-5            # 終了条件
     x_min, x_max = -5, 5 # 範囲
 
-    X = (x_max - x_min) * np.random.rand(M,D) + x_min # 位置
-    V = np.zeros((M,D)) # 速度
+    X = (x_max - x_min) * np.random.rand(M, D) + x_min # 位置
+    V = np.zeros((M, D)) # 速度
     F = np.zeros(M)     # 評価関数を格納
     Fp = np.full(M, float('inf'))      # pbest
     Xp = np.full((M, D), float('inf'))
     Fg = float('inf')                  # gbest
     Xg = np.full(D, float('inf'))
 
-    plot_t_list = []
     plot_fg_list = []
 
     for t in range(1, Tmax+1):
-        plot_t_list.append(t)
         plot_fg_list.append(Fg)
         for i in range(M):
             if fx == 'sphere':
@@ -57,7 +51,6 @@ def main(D, fx):
                 if Fp[i] < Fg:
                     Fg = Fp[i]
                     Xg = X[i]
-        
         if Fg < Cr:
             break
         for i in range(M):
@@ -66,16 +59,11 @@ def main(D, fx):
             V[i] = w*V[i] + c*r1*(Xp[i] - X[i]) + c*r2*(Xg - X[i])
             X[i] = X[i] + V[i]
 
-    # print(F)
-    # print(tmp)
-    return t, Fg, plot_t_list, plot_fg_list
+    return t, Fg, plot_fg_list
 
 if __name__ == "__main__":
     D_list = [2, 5, 20]     # 解の次元
-    fx_list = ['sphere', 'rastrigin']
-
-    time_list = np.array([])
-    fg_list = np.array([])
+    fx_list = ['sphere', 'rasitrigin']
     
     ans_d_list = []
     ans_fx_list = []
@@ -90,14 +78,14 @@ if __name__ == "__main__":
     
     for d in D_list:
         for fx in fx_list:
-            t_df = pd.DataFrame()
+            time_list = np.array([])
+            fg_list = np.array([])
             fg_df = pd.DataFrame()
             print(d, fx)
             for i in range(100): 
-                t, Fg, plot_t_list, plot_fg_list = main(d, fx)
+                t, Fg, plot_fg_list = main(d, fx)
                 time_list = np.append(time_list, t)
                 fg_list = np.append(fg_list, Fg)
-                t_df = pd.concat([t_df, pd.Series(plot_t_list)], axis=1)
                 fg_df = pd.concat([fg_df, pd.Series(plot_fg_list)], axis=1)
                 
             ans_d_list.append(d)
@@ -105,9 +93,8 @@ if __name__ == "__main__":
             ans_fg_mean_list.append(fg_list.mean())
             ans_fg_var_list.append(fg_list.var())
             ans_time_mean_list.append(time_list.mean())
-            ans_plot_t_mean_list.append(t_df.T.mean())
+
             ans_plot_fg_mean_list.append(fg_df.T.mean())
-            # [print(t, f) for t, f in zip(t_df.T.mean(), fg_df.T.mean())]
 
     df['d'] = ans_d_list
     df['fx_type'] = ans_fx_list
@@ -115,15 +102,15 @@ if __name__ == "__main__":
     df['fg_var'] = ['{:.3e}'.format(v) for v in ans_fg_var_list]
     df['time_mean'] = ans_time_mean_list
 
-    df.to_csv('pso.csv')
+    # df.to_csv('pso.csv')
     print(df)
 
-    plot_d_list = [2, 2, 5, 5, 20, 20]    
-    for i, fg in enumerate(ans_plot_fg_mean_list):
-        plt_df = pd.DataFrame(columns=['t', 'fg'])
-        plt_df['t'] = range(1000)
-        plt_df['fg'] = fg
-        if i % 2 == 0:
-            plt_df.to_csv('pso_sphere'+ str(plot_d_list[i]) +'.csv')
-        else:
-            plt_df.to_csv('pso_rastrigin'+ str(plot_d_list[i]) +'.csv')
+    # plot_d_list = [2, 2, 5, 5, 20, 20]    
+    # for i, fg in enumerate(ans_plot_fg_mean_list):
+    #     plt_df = pd.DataFrame(columns=['t', 'fg'])
+    #     plt_df['t'] = range(1000)
+    #     plt_df['fg'] = fg
+    #     if i % 2 == 0:
+    #         plt_df.to_csv('pso_sphere'+ str(plot_d_list[i]) +'.csv')
+    #     else:
+    #         plt_df.to_csv('pso_rastrigin'+ str(plot_d_list[i]) +'.csv')

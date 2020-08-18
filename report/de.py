@@ -110,9 +110,6 @@ if __name__ == "__main__":
     D_list = [2, 5, 20]   # 解の次元
     
     fx_list = ['sphere', 'rastrigin']
-
-    time_list = np.array([])
-    fg_list = np.array([])
     
     ans_d_list = []
     ans_fx_list = []
@@ -126,6 +123,8 @@ if __name__ == "__main__":
     
     for d in D_list:
         for fx in fx_list:
+            time_list = np.array([])
+            fg_list = np.array([])
             fg_df = pd.DataFrame()
             print(d, fx)
             for i in range(100): 
