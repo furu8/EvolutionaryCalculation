@@ -14,7 +14,6 @@ def plot_graph(name, pso_df, de_df):
     plt.xlim(-1, 1001)
     plt.ylim(-12, 7)
     plt.legend(loc='lower right')
-    # plt.show()
     plt.savefig(name)
     plt.show()
 

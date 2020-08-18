@@ -63,7 +63,7 @@ def main(D, fx):
 
 if __name__ == "__main__":
     D_list = [2, 5, 20]     # 解の次元
-    fx_list = ['sphere', 'rasitrigin']
+    fx_list = ['sphere', 'rastrigin']
     
     ans_d_list = []
     ans_fx_list = []

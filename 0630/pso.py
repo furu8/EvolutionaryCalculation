@@ -63,7 +63,7 @@ def main(M, D, c, w, fx):
 
 if __name__ == "__main__":
     M = 30                  # 粒子数
-    D_list = [2]     # 解の次元
+    D_list = [20]     # 解の次元
     c = 1.494               # PSOのパラメータ
     w = 0.729               # PSOのパラメータ
     fx_list = ['sphere', 'rastrigin']
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     
     for d in D_list:
         for fx in fx_list:
-            for i in range(100): 
+            for i in range(1): 
                 t, Fg, cnvg = main(M, d, c, w, fx)
                 time_list = np.append(time_list,t)
                 fg_list = np.append(fg_list,Fg)

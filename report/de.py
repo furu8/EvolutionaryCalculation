@@ -107,9 +107,9 @@ def main(D, fx):
     return t, Fbest, plot_fg_list
 
 if __name__ == "__main__":
-    D_list = [2, 5, 20]   # 解の次元
+    D_list = [20]   # 解の次元
     
-    fx_list = ['sphere', 'rastrigin']
+    fx_list = ['sphere']
     
     ans_d_list = []
     ans_fx_list = []
@@ -132,7 +132,7 @@ if __name__ == "__main__":
                 time_list = np.append(time_list, t)
                 fg_list = np.append(fg_list, Fg)
                 fg_df = pd.concat([fg_df, pd.Series(plot_fg_list)], axis=1)
-            
+                
             ans_d_list.append(d)
             ans_fx_list.append(fx)
             ans_fg_mean_list.append(fg_list.mean())
@@ -147,15 +147,14 @@ if __name__ == "__main__":
     df['fg_var'] = ['{:.3e}'.format(v) for v in ans_fg_var_list]
     df['time_mean'] = ans_time_mean_list
 
-    df.to_csv('de.csv')
-    print(df)
+    # df.to_csv('de.csv')
     
-    plot_d_list = [2, 2, 5, 5, 20, 20]    
-    for i, fg in enumerate(ans_plot_fg_mean_list):
-        plt_df = pd.DataFrame(columns=['t', 'fg'])
-        plt_df['t'] = range(1000)
-        plt_df['fg'] = fg
-        if i % 2 == 0:
-            plt_df.to_csv('de_sphere'+ str(plot_d_list[i]) +'.csv')
-        else:
-            plt_df.to_csv('de_rastrigin'+ str(plot_d_list[i]) +'.csv')
+    # plot_d_list = [2, 2, 5, 5, 20, 20]    
+    # for i, fg in enumerate(ans_plot_fg_mean_list):
+    #     plt_df = pd.DataFrame(columns=['t', 'fg'])
+    #     plt_df['t'] = range(1000)
+    #     plt_df['fg'] = fg
+    #     if i % 2 == 0:
+    #         plt_df.to_csv('de_sphere'+ str(plot_d_list[i]) +'.csv')
+    #     else:
+    #         plt_df.to_csv('de_rastrigin'+ str(plot_d_list[i]) +'.csv')
