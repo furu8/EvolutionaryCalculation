@@ -124,6 +124,6 @@ if __name__ == "__main__":
         plt_df['t'] = range(1000)
         plt_df['fg'] = fg
         if i % 2 == 0:
-            plt_df.to_csv('pso_shpere'+ str(plot_d_list[i]) +'.csv')
+            plt_df.to_csv('pso_sphere'+ str(plot_d_list[i]) +'.csv')
         else:
             plt_df.to_csv('pso_rastrigin'+ str(plot_d_list[i]) +'.csv')
