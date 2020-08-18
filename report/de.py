@@ -57,14 +57,12 @@ def main(D, fx):
     Fbest = float('inf')
     Xbest = np.full(D, float('inf'))
 
-    plot_t_list = []
     plot_fg_list = []
 
     # 初期値によるF = f(x^0ベクトル) の計算
     F = init_fx(M, D, X, fx)
 
     for t in range(1, Tmax+1):
-        plot_t_list.append(t)
         plot_fg_list.append(Fbest)
         for i in range(M):
             # 3個体選ぶ
@@ -106,16 +104,15 @@ def main(D, fx):
     # print("終了時刻t={}".format(t))
     # print("解の目的関数値Fbest={}".format(Fbest))
 
-    return t, Fbest, plot_t_list, plot_fg_list
+    return t, Fbest, plot_fg_list
 
 if __name__ == "__main__":
-    D_list = [2]   # 解の次元
+    D_list = [2, 5, 20]   # 解の次元
     
     fx_list = ['sphere', 'rastrigin']
 
     time_list = np.array([])
     fg_list = np.array([])
-    cnvg_plot_list = []
     
     ans_d_list = []
     ans_fx_list = []
@@ -123,21 +120,18 @@ if __name__ == "__main__":
     ans_fg_var_list = []
     ans_time_mean_list = []
 
-    ans_plot_t_mean_list = []
     ans_plot_fg_mean_list = []
     
     df = pd.DataFrame(columns=['d', 'fx_type', 'fg_mean', 'fg_var', 'time_mean'])
     
     for d in D_list:
         for fx in fx_list:
-            t_df = pd.DataFrame()
             fg_df = pd.DataFrame()
             print(d, fx)
-            for i in range(10): 
-                t, Fg, plot_t_list, plot_fg_list = main(d, fx)
+            for i in range(100): 
+                t, Fg, plot_fg_list = main(d, fx)
                 time_list = np.append(time_list, t)
                 fg_list = np.append(fg_list, Fg)
-                t_df = pd.concat([t_df, pd.Series(plot_t_list)], axis=1)
                 fg_df = pd.concat([fg_df, pd.Series(plot_fg_list)], axis=1)
             
             ans_d_list.append(d)
@@ -145,20 +139,24 @@ if __name__ == "__main__":
             ans_fg_mean_list.append(fg_list.mean())
             ans_fg_var_list.append(fg_list.var())
             ans_time_mean_list.append(time_list.mean())
-            ans_plot_t_mean_list.append(t_df.T.mean())
+            
             ans_plot_fg_mean_list.append(fg_df.T.mean())
-         
-        print("解の目的関数値Fg={}".format(ans_fg_mean_list))
-
-
+        
     df['d'] = ans_d_list
     df['fx_type'] = ans_fx_list
     df['fg_mean'] = ['{:.3e}'.format(m) for m in ans_fg_mean_list]
     df['fg_var'] = ['{:.3e}'.format(v) for v in ans_fg_var_list]
     df['time_mean'] = ans_time_mean_list
 
-    # df.to_csv('de.csv')
+    df.to_csv('de.csv')
     print(df)
-
-    plt.plot(ans_plot_t_mean_list[1], ans_plot_fg_mean_list[1])
-    plt.show()
+    
+    plot_d_list = [2, 2, 5,  5, 20, 20]    
+    for i, fg in enumerate(ans_plot_fg_mean_list):
+        plt_df = pd.DataFrame(columns=['t', 'fg'])
+        plt_df['t'] = range(1000)
+        plt_df['fg'] = fg
+        if i % 2 == 0:
+            plt_df.to_csv('de_shpere'+ str(plot_d_list[i]) +'.csv')
+        else:
+            plt_df.to_csv('de_rastrigin'+ str(plot_d_list[i]) +'.csv')

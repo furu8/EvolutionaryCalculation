@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import sys
-
+tmp = 0
 def sphere_func(D, X, i):
     ans = 0
     for d in range(D):
@@ -11,13 +11,17 @@ def sphere_func(D, X, i):
     return ans
 
 def rastringin_func(D, X, i):
+    global tmp
     ans = 0
     for d in range(D):
         Xd = X[i][d]
         ans += ((Xd**2) - 10*np.cos(2*np.pi*Xd) + 10)
+    if 1 > ans > 0.99:
+        tmp = X
     return ans
 
 def main(D, fx):
+    global tmp
     M = 30               # 粒子数
     c = 1.494            # PSOのパラメータ
     w = 0.729            # PSOのパラメータ
@@ -62,11 +66,12 @@ def main(D, fx):
             V[i] = w*V[i] + c*r1*(Xp[i] - X[i]) + c*r2*(Xg - X[i])
             X[i] = X[i] + V[i]
 
-    print(F)       
+    # print(F)
+    # print(tmp)
     return t, Fg, plot_t_list, plot_fg_list
 
 if __name__ == "__main__":
-    D_list = [2]     # 解の次元
+    D_list = [2, 5, 20]     # 解の次元
     fx_list = ['sphere', 'rastrigin']
 
     time_list = np.array([])
@@ -88,7 +93,7 @@ if __name__ == "__main__":
             t_df = pd.DataFrame()
             fg_df = pd.DataFrame()
             print(d, fx)
-            for i in range(10): 
+            for i in range(100): 
                 t, Fg, plot_t_list, plot_fg_list = main(d, fx)
                 time_list = np.append(time_list, t)
                 fg_list = np.append(fg_list, Fg)
@@ -110,8 +115,15 @@ if __name__ == "__main__":
     df['fg_var'] = ['{:.3e}'.format(v) for v in ans_fg_var_list]
     df['time_mean'] = ans_time_mean_list
 
-    # df.to_csv('pso.csv')
+    df.to_csv('pso.csv')
     print(df)
-    
-    plt.plot(ans_plot_t_mean_list[1], ans_plot_fg_mean_list[1])
-    plt.show()
+
+    plot_d_list = [2, 2, 5,  5, 20, 20]    
+    for i, fg in enumerate(ans_plot_fg_mean_list):
+        plt_df = pd.DataFrame(columns=['t', 'fg'])
+        plt_df['t'] = range(1000)
+        plt_df['fg'] = fg
+        if i % 2 == 0:
+            plt_df.to_csv('pso_shpere'+ str(plot_d_list[i]) +'.csv')
+        else:
+            plt_df.to_csv('pso_rastrigin'+ str(plot_d_list[i]) +'.csv')
