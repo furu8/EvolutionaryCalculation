@@ -1,2 +1,4 @@
 *.pdf
 .DS_Store
+report/*.docx
+report/*.pdf
