@@ -151,7 +151,7 @@ if __name__ == "__main__":
     df.to_csv('de.csv')
     print(df)
     
-    plot_d_list = [2, 2, 5,  5, 20, 20]    
+    plot_d_list = [2, 2, 5, 5, 20, 20]    
     for i, fg in enumerate(ans_plot_fg_mean_list):
         plt_df = pd.DataFrame(columns=['t', 'fg'])
         plt_df['t'] = range(1000)
